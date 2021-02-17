@@ -35,6 +35,8 @@ httpServer.listen(port, () => {
 // Serving static files
 app.use(express.static('public'));
 
+
+
 // Validate
 function validate(req, res, next) {
     const errors = validationResult(req);

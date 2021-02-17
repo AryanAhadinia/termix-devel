@@ -1,7 +1,7 @@
 import http from './httpService';
 import db from './db';
 
-const apiUrl = 'http://058a6a685fc8.ngrok.io/api';
+const apiUrl = '/api';
 
 export function getMyUserInfo() {
 	return http.get(apiUrl + '/user/my_account');

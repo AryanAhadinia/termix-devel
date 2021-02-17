@@ -2,10 +2,10 @@ document.getElementById('signout').onclick = () => {
     const req = new XMLHttpRequest();
     req.onreadystatechange = function () {
         if (this.readyState == 4) {
-            window.location.href = '/'
+            window.location.href = '/index'
         }
     }
-    req.open("POST", '/api/user/signup');
+    req.open("POST", '/api/user/signout');
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     req.send();
 }
