@@ -44,8 +44,6 @@ function validate(req, res, next) {
     next();
 }
 
-
-
 // APIs
 /*
 POST /api/user/signup with URLENCODED: email, password;
@@ -99,7 +97,6 @@ POST /api/user/forget_password/request with URLENCODED: email
 */
 app.get('/api/user/forget_password/serve/:token', user.serveForgetPassword);
 
-
 app.get('/api/user/verify/serve/:token', user.serveVerifyAccount);
 
 /*
@@ -122,41 +119,39 @@ app.get('/api/user/my_account',
     user.authenticateMiddleware,
     user.myAccount);
 
-// app.put('/api/user/update_account',
-//     user.authenticateMiddleware,
-//     body('firstName').isAlphanumeric().isLength({max: 30}).withMessage('نام وارد شده معتبر نیست.'),
-//     body('lastName').isLength({max: 30}).withMessage('نام خانوادگی معتبر نیست.'),
-//     body('stdId').isNumeric().isLength({min: 8, max: 8}).withMessage('شماره دانشجویی معتبر نیست'),
-//     body('major').isLength({max:50}).withMessage('رشته تحصیلی معتبر نیست.'),
-//     body('grade').isBoolean(),
-//     validate,
-//     user.validateMajor,
-//     user.minifyAccount,
-//     user.updateAccount,
-// );
+app.put('/api/user/update_account',
+    user.authenticateMiddleware,
+    body('firstName').isLength({max: 30}).withMessage('نام وارد شده معتبر نیست.'),
+    body('lastName').isLength({max: 30}).withMessage('نام خانوادگی معتبر نیست.'),
+    body('stdId').isNumeric().isLength({min: 8, max: 8}).withMessage('شماره دانشجویی معتبر نیست'),
+    body('major').isLength({max:50}).withMessage('رشته تحصیلی معتبر نیست.'),
+    body('grade').isBoolean(),
+    validate,
+    user.updateAccount,
+);
 
 app.get('/api/schedule/all_courses', schedule.allCourses);
-//
+
 app.get('/api/schedule/all_departments', schedule.allDepartments);
-//
+
 app.put('/api/schedule/select',
     user.authenticateMiddleware,
     body('courseId').isInt({ min: 20000, max: 100000 }).toInt(),
     body('groupId').isInt({ min: 1, max: 100 }).toInt(),
     validate,
     schedule.select);
-//
+
 app.delete('/api/schedule/unselect',
     user.authenticateMiddleware,
     body('courseId').isInt({ min: 20000, max: 100000 }).toInt(),
     body('groupId').isInt({ min: 1, max: 100 }).toInt(),
     validate,
     schedule.unselect);
-//
+
 app.get('/api/schedule/my_selections',
     user.authenticateMiddleware,
     schedule.mySelections);
-//
+
 app.delete('/api/admin/dropsemester',
     user.authenticateAdminMiddleware,
     admin.dropSemester);
@@ -169,5 +164,3 @@ app.put('/api/crawl',
 app.get('/test/ping', (req, res) => {
     res.send('pong');
 });
-
-

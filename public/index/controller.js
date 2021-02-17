@@ -84,7 +84,7 @@ document.getElementById("signup").onclick = function () {
             $('#signup').html('نام‌نویسی');
             $('#signup').removeAttr('disabled');
             if (this.status == 200) {
-                alert('#alert-placeholder-signup', 'success', 'نام‌نویسی خود را از سریق ایمیل تکمیل کنید.');
+                alert('#alert-placeholder-signup', 'success', 'نام‌نویسی خود را از طریق ایمیل تکمیل کنید.');
             } else if (this.status == 400) {
                 alert('#alert-placeholder-signup', 'danger', JSON.parse(this.responseText).msg || 'درخواست ارسال شده معتبر نیست.');
             } else if (this.status == 409) {

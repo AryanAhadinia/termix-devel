@@ -44,7 +44,7 @@ function signup(req, res) {
                     'email': req.body.email,
                     'password': sha256(req.body.password),
                     'role': 'std',
-                    'verified': false
+                    'verified': false,
                 };
                 users.insertOne(userObject, (err4, userInserted) => {
                     if (err4) {
@@ -97,7 +97,7 @@ function signin(req, res) {
             if (!user) {
                 return res.sendStatus(401);
             }
-            if (!user.verified) {
+            if (!user.verified || user.banned) {
                 res.status(401).send('حساب شما تایید نشده است.');
                 const token = getToken(user.email, user.role, false);
                 const link = `${process.env.URL}/api/user/verify/serve/${token}`;
@@ -953,7 +953,7 @@ function serveForgetPassword(req, res) {
         if (err || user.expiry < +new Date()) {
             return res.sendStatus(403);
         }
-        res.cookie('token', getToken(user.email, user.role), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
+        res.cookie('token', getToken(user.email, user.role, user.verified), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
         try {
             res.redirect('/user/change_password');
         } catch (e) { }
@@ -978,7 +978,7 @@ function serveVerifyAccount(req, res) {
                 if (err) {
                     return res.sendStatus(500);
                 }
-                res.cookie('token', getToken(user.email, user.role), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
+                res.cookie('token', getToken(user.email, user.role, user.verified), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
                 try {
                     res.redirect('/');
                 } catch (e) { }
@@ -993,12 +993,17 @@ function authenticateMiddleware(req, res, next) {
         return res.status(403).redirect('/');
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err || user.expiry < +new Date() || !user.verfied) {
+        if (err || user.expiry < +new Date() || !user.verified) {
             return res.status(403).redirect('/');
         }
-        req.user = user;
-        res.cookie('token', getToken(user.email, user.role, user.verfied), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
-        next();
+        database.accessPermission(user.email, (denied, accept) => {
+            if (denied) {
+                return res.status(403).redirect('/');
+            }
+            req.user = user;
+            res.cookie('token', getToken(user.email, user.role, user.verfied), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
+            next();
+        });
     });
 }
 
@@ -1011,9 +1016,14 @@ function authenticateAdminMiddleware(req, res, next) {
         if (err || user.expiry < +new Date() || user.role != 'admin') {
             return res.status(403).redirect('/');
         }
-        req.user = user;
-        res.cookie('token', getToken(user.email, user.role, user.verified), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
-        next();
+        database.accessPermission(user.email, (denied, accept) => {
+            if (denied) {
+                return res.status(403).redirect('/');
+            }
+            req.user = user;
+            res.cookie('token', getToken(user.email, user.role, user.verfied), { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
+            next();
+        });
     });
 }
 
@@ -1077,7 +1087,14 @@ function minifyAccount(req, res) {
 }
 
 function updateAccount(req, res) {
-    res.sendStatus(200);
+    MongoClient.connect(process.env.DB_URL, (err, db) => {
+        db.collection('User').updateOne({email: req.user.email},  { $set: req.body }, (err, updated) => {
+            if (err) {
+                return res.sendStatus(500);
+            }
+            res.sendStatus(200);
+        })
+    })
 }
 
 module.exports = {

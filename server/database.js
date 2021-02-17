@@ -1,5 +1,4 @@
 const { MongoClient } = require("mongodb");
-const { emit } = require("nodemon");
 const redis = require("redis");
 
 const redisClient = redis.createClient(process.env.REDIS_PORT);
@@ -102,6 +101,34 @@ function emailPermission(email, callback) {
     });
 }
 
+function selectPermission(email, callback) {
+    if (Math.random() > 0.02) {
+        return callback(false, true);
+    }
+    MongoClient.connect(process.env.DB_URL, (err, db) => {
+        if (err) {
+            return callback(false, true);
+        }
+        db.collection('Selection').find({ email: email }).toArray((err, selections) => {
+            if (selections.length > 100) {
+                db.collection('User').updateOne({ email: email }, { $set: { 'banned': true } }, (err1, res) => {});
+                redisClient.sadd("banned", email);
+                callback(true, false);
+            }
+            return callback(false, true);
+        });
+    });
+}
+
+function accessPermission(email, callback) {
+    redisClient.sismember("banned", email, (err, res) => {
+        if (err || res == false) {
+            return callback(false, true);
+        }
+        selectPermission(email, callback);
+    });
+}
+
 function drop(callback) {
     redisClient.flushall(callback);
 }
@@ -111,5 +138,7 @@ module.exports = {
     "departments": departments,
     "departmentsList": departmentsList,
     "emailPermission": emailPermission,
+    "selectPermission": selectPermission,
+    "accessPermission": accessPermission,
     "drop": drop
 }

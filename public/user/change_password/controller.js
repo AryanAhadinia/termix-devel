@@ -1,7 +1,6 @@
 function setEmail() {
     $('#email').attr('disabled', 'disabled');
     const req = new XMLHttpRequest();
-    const url = '/api/user/my_account';
     req.onreadystatechange = function () {
         if (this.readyState == 4) {
             if (this.status == 200) {
@@ -12,7 +11,7 @@ function setEmail() {
             }
         }
     }
-    req.open("GET", url);
+    req.open("GET", '/api/user/my_account');
     req.send();
 }
 setEmail();
