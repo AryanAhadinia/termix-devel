@@ -27,6 +27,6 @@ function redirectToPanel(role) {
     if (role === 'admin') {
         window.location.href = "/admin";
     } else {
-        console.log("std");
+        window.location.href = "/"
     }
 }

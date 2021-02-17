@@ -43,7 +43,7 @@ document.getElementById("change").onclick = function () {
             $('#change').html('دگرش گذرواژه');
             $('#change').removeAttr('disabled');
             if (this.status == 200) {
-                window.location.href = '/'
+                window.location.href = '/index'
             } else if (this.status == 400) {
                 alert('danger', JSON.parse(this.responseText).msg);
             } else if (this.status == 403) {
