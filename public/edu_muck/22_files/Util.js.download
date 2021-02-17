@@ -1,0 +1,444 @@
+function startclock() {
+	var now= new Date();
+	now.setTime(document.getElementById('serverCurrentTime').value);
+	document.getElementById('serverCurrentTime').value=now.getTime()+1000;
+	var hours = now.getHours();
+	var minutes = now.getMinutes();
+	var seconds = now.getSeconds();
+	var timeValue = "" + ((hours > 12) ? hours : hours);
+	timeValue += ((minutes < 10) ? ":0" : ":") + minutes;
+	timeValue += ((seconds < 10) ? ":0" : ":") + seconds;
+	// timeValue += (hours >= 12) ? " بعد ازظهر" : "قبل از ظهر"
+	if (document.getElementById("currentClock")) {
+
+		document.getElementById("currentClock").innerHTML = timeValue;
+		setTimeout("startclock()", 1000);
+	}
+
+}
+
+function maskKeyPress(objEvent) {
+	var iKeyCode;
+//	var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CONTROL","ALT","PAUSE","CAPS_LOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESCAPE","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9","COLON","SEMICOLON","LESS_THAN","EQUALS","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","DOUBLE_QUOTE","HASH","DOLLAR","PERCENT","AMPERSAND","UNDERSCORE","OPEN_PAREN","CLOSE_PAREN","ASTERISK","PLUS","PIPE","HYPHEN_MINUS","OPEN_CURLY_BRACKET","CLOSE_CURLY_BRACKET","TILDE","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","","SEMICOLON","EQUALS","COMMA","MINUS","PERIOD","SLASH","BACK_QUOTE","","","","","","","","","","","","","","","","","","","","","","","","","","","OPEN_BRACKET","BACK_SLASH","CLOSE_BRACKET","QUOTE","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
+	var keyboardMap = [37,38,39,40,32,13,96,97,98,99,100,101,102,103,104,105,48,49,50,51,52,53,54,55,56,57];
+	var e = window.event || objEvent;
+	if ((e.charCode) && (e.keyCode == 0))
+		iKeyCode = e.charCode
+	else
+		iKeyCode = e.keyCode;
+	
+	if(iKeyCode==8||iKeyCode==46){return true;}
+	
+	for(var  i=0;i<keyboardMap.length;i++){
+		if(keyboardMap[i]==iKeyCode){ return true;}
+	}
+	if(iKeyCode<47){
+		return true;
+	}
+	return false;
+}
+
+
+
+function numberMaskKeyPress(objEvent) {
+	return maskKeyPress(objEvent);
+	/*var iKeyCode;
+
+	var e = window.event || objEvent;
+	if ((e.charCode) && (e.keyCode == 0))
+		iKeyCode = e.charCode
+	else
+		iKeyCode = e.keyCode;
+
+	 return ((iKeyCode > 64 && iKeyCode < 91) || (iKeyCode > 96 && iKeyCode < 123) || (iKeyCode >= 188 && iKeyCode <= 190)|| iKeyCode == 8 || iKeyCode == 32 || (iKeyCode >= 48 && iKeyCode <= 57));
+	if ((iKeyCode >= 48) && (iKeyCode <= 57))
+		return true;
+	if (iKeyCode == 46)
+		return true;
+	return false;*/
+}
+
+function englishUpperMaskKeyPress(objEvent) {
+	
+	var iKeyCode;
+//	var keyboardMap = ["","","","CANCEL","","","HELP","","BACK_SPACE","TAB","","","CLEAR","ENTER","RETURN","","SHIFT","CONTROL","ALT","PAUSE","CAPS_LOCK","KANA","EISU","JUNJA","FINAL","HANJA","","ESCAPE","CONVERT","NONCONVERT","ACCEPT","MODECHANGE","SPACE","PAGE_UP","PAGE_DOWN","END","HOME","LEFT","UP","RIGHT","DOWN","SELECT","PRINT","EXECUTE","PRINTSCREEN","INSERT","DELETE","","0","1","2","3","4","5","6","7","8","9","COLON","SEMICOLON","LESS_THAN","EQUALS","GREATER_THAN","QUESTION_MARK","AT","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","WIN","","CONTEXT_MENU","","SLEEP","NUMPAD0","NUMPAD1","NUMPAD2","NUMPAD3","NUMPAD4","NUMPAD5","NUMPAD6","NUMPAD7","NUMPAD8","NUMPAD9","MULTIPLY","ADD","SEPARATOR","SUBTRACT","DECIMAL","DIVIDE","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","","","","","","","","","NUM_LOCK","SCROLL_LOCK","WIN_OEM_FJ_JISHO","WIN_OEM_FJ_MASSHOU","WIN_OEM_FJ_TOUROKU","WIN_OEM_FJ_LOYA","WIN_OEM_FJ_ROYA","","","","","","","","","","CIRCUMFLEX","EXCLAMATION","DOUBLE_QUOTE","HASH","DOLLAR","PERCENT","AMPERSAND","UNDERSCORE","OPEN_PAREN","CLOSE_PAREN","ASTERISK","PLUS","PIPE","HYPHEN_MINUS","OPEN_CURLY_BRACKET","CLOSE_CURLY_BRACKET","TILDE","","","","","VOLUME_MUTE","VOLUME_DOWN","VOLUME_UP","","","SEMICOLON","EQUALS","COMMA","MINUS","PERIOD","SLASH","BACK_QUOTE","","","","","","","","","","","","","","","","","","","","","","","","","","","OPEN_BRACKET","BACK_SLASH","CLOSE_BRACKET","QUOTE","","META","ALTGR","","WIN_ICO_HELP","WIN_ICO_00","","WIN_ICO_CLEAR","","","WIN_OEM_RESET","WIN_OEM_JUMP","WIN_OEM_PA1","WIN_OEM_PA2","WIN_OEM_PA3","WIN_OEM_WSCTRL","WIN_OEM_CUSEL","WIN_OEM_ATTN","WIN_OEM_FINISH","WIN_OEM_COPY","WIN_OEM_AUTO","WIN_OEM_ENLW","WIN_OEM_BACKTAB","ATTN","CRSEL","EXSEL","EREOF","PLAY","ZOOM","","PA1","WIN_OEM_CLEAR",""];
+	var keyboardMap = [37,38,39,40,32,13,96,97,98,99,100,101,102,103,104,105,48,49,50,51,52,53,54,55,56,57];
+	var e = window.event || objEvent;
+	if ((e.charCode) && (e.keyCode == 0))
+		iKeyCode = e.charCode
+	else
+		iKeyCode = e.keyCode;
+	
+	if(iKeyCode==8||iKeyCode==46){return true;}
+	for(var  i=0;i<keyboardMap.length;i++){
+		if(keyboardMap[i]==iKeyCode){ return true;}
+	}
+	if(iKeyCode<47){
+		return true;
+	}
+	
+	if ((iKeyCode >= 65) && (iKeyCode <= 90))
+		return true;
+	
+	
+	return false;
+	
+}
+
+function persianMaskKeyPress(objEvent) {
+	var iKeyCode;
+
+	var e = window.event || objEvent;
+	if ((e.charCode) && (e.keyCode == 0))
+		iKeyCode = e.charCode
+	else
+		iKeyCode = e.keyCode;
+
+	if(iKeyCode==8||iKeyCode==46){return true;}
+	
+	if (iKeyCode == 32)
+		return true;
+	if ((iKeyCode >= 65) && (iKeyCode <= 90))
+		return false;
+	if ((iKeyCode >= 97) && (iKeyCode <= 122))
+		return false;
+	return true;
+}
+
+/** ****************************************** */
+
+// gp colum selection scripts
+function selectColumn(id) {
+	var retVal = insertColumnSelectionMenu(id, eval("columnsNameArray" + id),
+			eval("document.mainForm.columnsMask" + id + ".value"));
+	if ((retVal != null)
+			&& (eval("document.mainForm.columnsMask" + id + ".value") != retVal)) {
+		eval("document.mainForm.columnsMask" + id + ".value=retVal;");
+		if (document.mainForm.scrollPosition) {
+			setScrollPosition(document.mainForm);
+		}
+		document.mainForm.submit();
+	}
+}
+
+function saveSelectColumn(id) {
+	var val = "1";
+	eval("document.mainForm.saveColumnsMask" + id + ".value=val;");
+	if (document.mainForm.scrollPosition) {
+		setScrollPosition(document.mainForm);
+	}
+	document.mainForm.submit();
+}
+
+function insertColumnSelectionMenu(id, columns, notSelectedMask) {
+	var frm = document.getElementById("cs_" + id + "_pos");
+	if (frm.innerHTML.length == 0) {
+		frm.innerHTML = "<br><table style='position:absolute; offsetLeft:60;' id='"
+				+ id
+				+ "_columns'><tr><td><iframe name='"
+				+ id
+				+ "_frame' id='"
+				+ id
+				+ "_frame' src='about:blank' width='150' marginwidth='0' marginheight='0' hspace='0' offsetHeight='30px' offsetLeft='70px' frameborder='1' height='100'></iframe></td></tr></table>";
+		var theFrame = window.frames(id + "_frame");
+		theFrame.location.reload();
+		showmenuColumnSelection(document.getElementById(id + "_columns"));
+		makemenuColumnSelection(id, theFrame.document, columns, notSelectedMask);
+		return null;
+	} else {
+		var theFrame = window.frames(id + "_frame");
+		var retval = getValuesColumnSelection(id, theFrame.document, columns);
+		hidemenuColumnSelection(document.getElementById(id + "_columns"));
+		frm.innerHTML = "";
+		return retval;
+	}
+}
+
+function showmenuColumnSelection(elmnt) {
+	elmnt.style.visibility = "visible";
+}
+function hidemenuColumnSelection(elmnt) {
+	elmnt.style.visibility = "hidden";
+}
+
+function makemenuColumnSelection(id, elemnt, columns, notSelected) {
+	elemnt
+			.write("<html><head><link rel='stylesheet' type='text/css' href='css/style.css'/></head>");
+	elemnt.write("<body dir='rtl'>");
+	elemnt.write("<table cellspacing='0' cellpadding='0' border='0'>");
+	var mask = 1;
+	for ( var i = 0; i < columns.length; i++) {
+		var s = columns[i];
+		elemnt.write("<tr><td class='clstext'><input id='" + id + "_ch" + i
+				+ "' type='checkbox' class='clsCheckBox' "
+				+ (((notSelected & mask) == 0) ? "checked" : "") + ">"
+				+ columns[i] + "</input></td></tr>");
+		mask <<= 1;
+	}
+	elemnt.write("</table>");
+	elemnt.write("</body></html>");
+}
+
+function getValuesColumnSelection(id, elemnt, columns) {
+	var retval = 0;
+	var mask = 1;
+	for ( var i = 0; i < columns.length; i++) {
+		var elm = elemnt.getElementById(id + "_ch" + i);
+		if (!elm.checked)
+			retval |= mask;
+		mask <<= 1;
+	}
+	return retval;
+}
+
+function pageNavigate(page, id) {
+	document.getElementById("command").value = document
+			.getElementById("command").defaultValue;
+
+	eval("document.mainForm.pagingPage" + id + ".value=page");
+	if (document.mainForm.scrollPosition) {
+		setScrollPosition(document.mainForm);
+	}
+
+	document.mainForm.submit();
+}
+
+function reorder(column, direction, id) {
+	document.getElementById("command").value = document
+			.getElementById("command").defaultValue;
+	eval("document.mainForm.sortColumn" + id + ".value=column");
+	eval("document.mainForm.sortDirection" + id + ".value=direction");
+	if (document.mainForm.scrollPosition) {
+		setScrollPosition(document.mainForm);
+	}
+	document.mainForm.submit();
+}
+
+// end of column selection scripts
+
+// **************Some utils for validating numerical fields
+
+function validateInt() {
+	var o = document.frmInput.txtInput;
+	switch (isInteger(o.value)) {
+	case true:
+		return true;
+		break;
+	case false:
+		return false;
+	}
+}
+
+function validateRange(number) {
+	var s = number;
+	var A = document.mainForm.minYear.value;
+	var B = document.mainForm.maxYear.value;
+
+	return validateRange(s, A, B);
+}
+
+function validateRange(number, min, max) {
+	var s = number;
+	var A = min
+	var B = max
+
+	switch (isIntegerInRange(s, A, B)) {
+	case true:
+		return true;
+		break;
+	case false:
+		return false;
+	}
+}
+
+function validateDay(number) {
+	var s = number;
+	var A = 1
+	var B = 31
+
+	switch (isIntegerInRange(s, A, B)) {
+	case true:
+		return true;
+		break;
+	case false:
+		return false;
+	}
+}
+
+function isIntegerInRange(s, a, b) {
+	if (isEmpty(s))
+		if (isIntegerInRange.arguments.length == 1) {
+			return false;
+		} else {
+
+			return (isIntegerInRange.arguments[1] == true);
+		}
+
+	/*
+	 * Catch non-integer strings to avoid creating a NaN below, which isn't
+	 * available on JavaScript 1.0 for Windows.
+	 */
+	if (!isInteger(s, false)) {
+		return false;
+	}
+
+	/*
+	 * Now, explicitly change the type to integer via parseInt so that the
+	 * comparison code below will work both on JavaScript 1.2 (which typechecks
+	 * in equality comparisons) and JavaScript 1.1 and before (which doesn't).
+	 */
+	var num = parseInt(s);
+	return ((num >= a) && (num <= b));
+}
+
+function isInteger(s) {
+	var i;
+
+	if (isEmpty(s))
+		if (isInteger.arguments.length == 1)
+			return 0;
+		else
+			return (isInteger.arguments[1] == true);
+	for (i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		if (!isDigit(c))
+			return false;
+	}
+	return true;
+}
+
+function isEmpty(s) {
+	return ((s == null) || (s.length == 0))
+}
+
+function isDigit(c) {
+	return ((c >= "0") && (c <= "9"))
+}
+
+function lessThan(num1, num2) {
+	var t1 = parseInt(num1);
+	var t2 = parseInt(num2);
+
+	if (t1 < t2)
+		return true;
+	else
+		return false;
+	return true;
+}
+// end of numerical utils
+// check&SetDate Column
+function getDateTimeStamp(x, y) {
+
+	var c;
+	if (y == 'true') {
+		if (document.getElementById(x + "_year").value == '') {
+			if (document.getElementById(x + "_year").type != 'hidden') {
+				document.getElementById(x + "_year").focus();
+			}
+			return '0';
+		}
+	}
+	if (document.getElementById(x + "_year").value == ''
+			&& document.getElementById(x + "_month").value == ''
+			&& document.getElementById(x + "_day").value == '') {
+		return '';
+	}
+	if ((document.getElementById(x + "_year").value != '' && (document
+			.getElementById(x + "_month").value == '' || document
+			.getElementById(x + "_day").value == ''))
+			|| (document.getElementById(x + "_month").value != '' && (document
+					.getElementById(x + "_year").value == '' || document
+					.getElementById(x + "_day").value == ''))
+			|| (document.getElementById(x + "_day").value != '' && (document
+					.getElementById(x + "_month").value == '' || document
+					.getElementById(x + "_year").value == ''))
+			|| (document.getElementById(x + "_year").value == '' && (document
+					.getElementById(x + "_month").value != '' || document
+					.getElementById(x + "_day").value != ''))
+			|| (document.getElementById(x + "_month").value == '' && (document
+					.getElementById(x + "_year").value != '' || document
+					.getElementById(x + "_day").value != ''))
+			|| (document.getElementById(x + "_day").value == '' && (document
+					.getElementById(x + "_month").value != '' || document
+					.getElementById(x + "_year").value != '')))
+
+	{
+		if (document.getElementById(x + "_year").type != 'hidden') {
+			document.getElementById(x + "_year").focus();
+		}
+		return '0';
+	}
+	if (document.getElementById(x + "_year").value != ''
+			&& document.getElementById(x + "_month").value != ''
+			&& document.getElementById(x + "_day").value != '') {
+		var str = document.getElementById(x + "_year").value + "."
+				+ document.getElementById(x + "_month").value + "."
+				+ document.getElementById(x + "_day").value;
+
+		if (str.length >= 8 && str.length <= 10) {
+			var m, d;
+			if (document.getElementById(x + "_month").value.length == 1) {
+				m = '0' + document.getElementById(x + "_month").value;
+			} else {
+				m = document.getElementById(x + "_month").value;
+			}
+
+			if (document.getElementById(x + "_day").value.length == 1) {
+				d = '0' + document.getElementById(x + "_day").value;
+			} else {
+				d = document.getElementById(x + "_day").value;
+			}
+
+			c = document.getElementById(x + "_year").value + "." + m + "." + d;
+		} else {
+			return '0';
+		}
+		if (document.getElementById(x + "_hours")) {
+			c = c + " " + document.getElementById(x + "_hours").value;
+		}
+		if (document.getElementById(x + "_minutes")) {
+			c = c + ":" + document.getElementById(x + "_minutes").value;
+		}
+		if (document.getElementById(x + "_hours")
+				&& !document.getElementById(x + "_minutes")) {
+			c = c + ":00";
+		}
+		return c;
+	}
+	return '';
+}
+/** *scrollPage** */
+
+function getScroll() {
+	if (document.body.scrollTop != undefined) { // IE model
+		var ieBox = document.compatMode != "CSS1Compat";
+		var cont = ieBox ? document.body : document.documentElement;
+		return {
+			x : cont.scrollLeft,
+			y : cont.scrollTop
+		};
+	} else {
+		return {
+			x : window.pageXOffset,
+			y : window.pageYOffset
+		};
+	}
+}
+
+function setScroll(scr) {
+
+	if (document.body.scrollTop != undefined) {
+		var ieBox = document.compatMode != "CSS1Compat";
+		var cont = ieBox ? document.body : document.documentElement;
+		cont.scrollLeft = scr.x;
+		cont.scrollTop = scr.y;
+	} else {
+		window.pageXOffset = scr.x;
+		window.pageYOffset = scr.y;
+	}
+}
+
+function setScrollPosition(t) {
+	var scr = getScroll();
+	t.scrollPosition.value = "{x:" + scr.x + ",y:" + scr.y + "}";
+}

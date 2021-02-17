@@ -1,0 +1,44 @@
+{
+  "name": "termix",
+  "version": "1.0.0",
+  "description": "term + mix = termix",
+  "main": "server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AryanAhadinia/termix.git"
+  },
+  "author": "termix org. ltd.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AryanAhadinia/termix/issues"
+  },
+  "homepage": "https://github.com/AryanAhadinia/termix#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.6.0",
+    "cheerio": "^1.0.0-rc.5",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.9.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^2.2.33",
+    "nodemailer": "^6.4.18",
+    "nstall": "^0.2.0",
+    "react-bootstrap": "^1.4.3",
+    "react-parallax-tilt": "^1.4.82",
+    "redis": "^3.0.2",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "sha256": "^0.2.0"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "eslint": "^7.20.0",
+    "eslint-config-google": "^0.14.0",
+    "nodemon": "^2.0.7"
+  }
+}

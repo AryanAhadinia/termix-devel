@@ -1,0 +1,626 @@
+﻿var user = {
+	certificate : "",
+	pubKey : "",
+	keyId : "",
+	tokenInfo : "",
+	certInfoIdex : "",
+	pincode : "",
+	tokenSlotIdx : 0,
+	certThumbPrint : ""
+};
+
+
+var ctr = 0;
+var maxValidCertCtr = 0;
+var i = 0;
+users = new Array();
+var refreshCheck = 0;
+var certCheck = false;
+var signerKeyID = "";
+var pincode = "";
+var ii = 0;
+var present;
+var rootMethod;
+function getCertThumbPrint() {
+	if (users.length == 0) {
+		return "";
+	}
+	return users[0].certThumbPrint;
+}
+
+// var toBeSign,signetureField,orginalDataField,certThumbPrintField, myTime;
+// /////////////////////////////////
+function createKey(stdID, termID, lesID, grade2, state, timeValue) {
+	//var value =  "a";
+	var grade=new String(grade2);
+	var value =stdID+"_"+termID+"_"+lesID;
+	if ((grade != '') && !((state == 4) || (state == 5) || (state == 3)||(state ==13))) {
+
+		return null;
+	}
+	var tt=false;
+	if(grade!=null&&grade.length>2){
+		tt=(grade.trim().substring(grade.length-2)==".0");
+	}
+	if(grade!=null&&tt){
+		grade=grade.substring(0,grade.indexOf("."));
+	}
+	if (grade != '') {
+		if(state ==13){
+			value=value+"_"+grade+"_"+state;
+			}else{
+				value=value+"_"+grade+"_0";
+			}
+		
+	} else {
+		if (state == 3) {
+			return "";
+		}
+		value = value + "_" + "-1" + "_" + state;
+	}
+	value = value + ("_" + timeValue);
+	return value;
+}
+
+var beforeRootMethod, orginalDataForSign, signetureField, orginalDataField, certThumbPrintField, listObjForSign;
+var dosign = false;
+function login(init) {
+	if (init) {
+		i = 0;
+		if(! document.getElementById("pinCode")){return false;}
+		pincode = document.getElementById("pinCode").value;
+		if (pincode == "") {
+			alert("پین کد خالی است.");
+			document.getElementById("pinCode").focus();
+			return false;
+		}
+		//users = new Array();
+		/*certThumbPrintField = certThumbPrintElement;*/
+		beforeRootMethod = rootMethod;
+	}
+	if (PK_Login.isCalled && PK_Import.isCalled && PK_SetSignMech) {
+		return true;
+	}
+	
+	if(users.length==0){return false;}
+	rootMethod = "login()";
+			
+	// /////////////////////login
+	// --- Load Cryptoki Operation ---
+	if (!PK_Login.isCalled) {
+		PK_Login.rootMethod = rootMethod;
+		PK_Login.showErrorAlert = false;
+		PK_Login.pk_ipUserType = 1;
+		PK_Login.pk_ipSlotId = users[0].tokenSlotIdx;
+		PK_Login.pk_ipPincode = pincode;
+		PK_Login.call();
+		return true;
+	} else if (PK_Login.isCalled && !PK_Login.success) {
+		PK_Login.reset();
+		PK_SetCryptoki.reset();
+		alert("can not login  : " + PK_Login.pk_opErrorMessage + ' ('
+				+ PK_Login.pk_opErrorCode + ')');
+		return false;
+
+	}
+
+	if (!PK_SetSignMech.isCalled) {
+		PK_SetSignMech.rootMethod = rootMethod;
+		PK_SetSignMech.showErrorAlert = false;
+		PK_SetSignMech.pk_ipSignatureFormat = 1;
+		PK_SetSignMech.pk_ipSignHashAlg = 3;
+		PK_SetSignMech.pk_ipSignMechanism = 1;
+		PK_SetSignMech.pk_ipSaltLen = 0;
+		PK_SetSignMech.pk_ipMgf = 0;
+		PK_SetSignMech.call();
+		return true;
+	} else if (PK_SetSignMech.isCalled && !PK_SetSignMech.success) {
+		PK_SetSignMech.reset();
+		PK_Login.reset();
+		PK_SetCryptoki.reset();
+		alert("signing operation has been failed due to : "
+				+ PK_SetSignMech.pk_opErrorMessage + ' ('
+				+ PK_SetSignMech.pk_opErrorCode + ')');
+		return false;
+
+	}
+	// //////////////////////////////////////
+	// // --- Import Operation ---
+	if (!PK_Import.isCalled) {
+		PK_Import.rootMethod = rootMethod;
+		PK_Import.showErrorAlert = false;
+		PK_Import.pk_ipSlotId = users[0].tokenSlotIdx;
+		PK_Import.pk_ipSessionType = 1;
+		PK_Import.pk_ipObjectType = 1;
+		PK_Import.pk_ipObject = users[0].pubKey;
+		PK_Import.pk_ipPKCS12Pass = "";
+		PK_Import.call();
+		return true;
+	} else if (PK_Import.isCalled && !PK_Import.success
+			&& PK_Import.pk_opErrorCode != 9) {
+		PK_Import.reset();
+		PK_SetSignMech.reset();
+		PK_Login.reset();
+		PK_SetCryptoki.reset();
+		alert("signing operation has been failed due to : "
+				+ PK_Import.pk_opErrorMessage + ' (' + PK_Import.pk_opErrorCode
+				+ ')');
+		return false;
+
+	} else if (PK_Import.isCalled
+			&& (PK_Import.pk_opErrorCode == 0 || PK_Import.pk_opErrorCode == 9)) {
+		signerKeyID = PK_Import.pk_opKeyID;
+		signerKeyIDLen = PK_Import.pk_opKeyIDLen;
+		// executeSign();
+		alert("logined");
+		rootMethod=beforeRootMethod;
+		eval(rootMethod);
+		return true;
+
+	}
+
+	// return true;
+
+}
+
+var signedList = [];
+var checkLog=false;
+
+function signList(initEnter, list) {
+	if (initEnter) {
+		if(list==null||list.length==0){return true;}
+		listObjForSign = list;
+		if (!listObjForSign || listObjForSign.length == 0) {
+			return false;
+		}
+		ii = 0;
+		signedList = new Array();
+		checkLog=PK_Login.isCalled;
+	}
+	rootMethod = "signList()";
+	if(users.length==0){
+		if(!showCert(true)){return false;}
+	}
+	if (users.length>0&&!checkLog&&!PK_Login.isCalled) {
+		checkLog=true;
+		if(!login(true)){return false;}
+		
+	}
+	if(ii >= listObjForSign.length){
+		return true;
+	}
+	// //////////////////////////////////////
+	if (PK_Login.isCalled) {
+	while (ii < listObjForSign.length) {
+		var temp = listObjForSign[ii];
+		if (PK_Sign.isCalled && PK_Sign.success) {
+			
+			document.getElementById(temp[1]).value = PK_Sign.pk_opSignature;
+			document.getElementById(temp[2]).value = atob(PK_Sign.pk_ipTbs);
+			ii++;
+			PK_Sign.reset();
+			PK_SetSignMech.reset();
+		}
+		if(ii < listObjForSign.length){
+			temp = listObjForSign[ii];
+			if (!sign(temp[0])) {
+				return false;
+			}
+		}
+		// return true;
+	}
+	if(ii >= listObjForSign.length){
+		if(document.getElementById("notshowalert")&&document.getElementById("notshowalert").value=="true"){	
+		}else{
+			alert("امضا با موفقیت انجام شد.");
+		}
+	
+	return true;
+	}
+	}else{
+		return false;
+	}
+return false;
+}
+
+var toBeSign;
+function sign(toB) {
+	if (toB) {
+		;
+
+		toBeSign = toB;
+		beforeRootMethod = rootMethod;
+
+	}
+	rootMethod = "sign()";
+	if (!PK_SetSignMech.isCalled) {
+		PK_SetSignMech.rootMethod = rootMethod;
+		PK_SetSignMech.showErrorAlert = false;
+		PK_SetSignMech.pk_ipSignatureFormat = 1;
+		PK_SetSignMech.pk_ipSignHashAlg = 3;
+		PK_SetSignMech.pk_ipSignMechanism = 1;
+		PK_SetSignMech.pk_ipSaltLen = 0;
+		PK_SetSignMech.pk_ipMgf = 0;
+		PK_SetSignMech.call();
+		return true;
+	} else if (PK_SetSignMech.isCalled && !PK_SetSignMech.success) {
+		PK_SetSignMech.reset();
+		PK_Login.reset();
+		PK_SetCryptoki.reset();
+		alert("signing operation has been failed due to _PK_SetSignMech: "
+				+ PK_SetSignMech.pk_opErrorMessage + ' ('
+				+ PK_SetSignMech.pk_opErrorCode + ')');
+		return false;
+
+	}
+
+	var toBeSignBase64 = btoa(unescape(encodeURIComponent(toBeSign)));
+	if (!PK_Sign.isCalled) {
+		rootMethod = beforeRootMethod;
+		PK_Sign.rootMethod = rootMethod;
+		PK_Sign.showErrorAlert = false;
+		PK_Sign.pk_ipSignMethodType = 0;
+		PK_Sign.pk_ipLogoutAfterSign = 0;
+		PK_Sign.pk_ipTbsType = 0;
+		PK_Sign.pk_ipTbsHashAlg = 0;
+		PK_Sign.pk_ipTbs = toBeSignBase64;
+		PK_Sign.pk_ipUsage = "";
+		PK_Sign.pk_ipSignerKeyId = signerKeyID;
+		PK_Sign.call();
+		return true;
+	} else if (PK_Sign.isCalled && !PK_Sign.success) {
+		PK_Sign.reset();
+		PK_Import.reset();
+		PK_SetSignMech.reset();
+		PK_Login.reset();
+		PK_SetCryptoki.reset();
+		alert("signing operation has been failed due to _PK_Sign: "
+				+ PK_Sign.pk_opErrorMessage + ' (' + PK_Sign.pk_opErrorCode
+				+ ')');
+		return false;
+
+	} //else if (PK_Sign.isCalled && !PK_Sign.success) {
+		//rootMethod = beforeRootMethod;
+		//return true;
+	//}
+}
+
+function showCert(init){
+	if(users.length>0){
+		return true;
+	}
+	if(!document.getElementById("certThumbPrint")){
+		alert("محل قرار گرفتن TumbPrint مشخص نشده است.");
+		return false;
+	}
+	if(init){
+		beforeRootMethod=rootMethod;
+		rootMethod="showCert()";
+	}
+	// --- Service Connection Operation ---
+	if (!PK_ServiceConnection.isCalled) {
+		PK_ServiceConnection.rootMethod = rootMethod;
+		PK_ServiceConnection.showErrorAlert = false;
+		PK_ServiceConnection.call("https");
+		return true;
+	} else if (PK_ServiceConnection.isCalled && !PK_ServiceConnection.success) {
+		PK_ServiceConnection.reset();
+		alert("signing operation has been failed due to _PK_ServiceConnection: "
+				+ PK_ServiceConnection.pk_opErrorMessage + ' ('
+				+ PK_ServiceConnection.pk_opErrorCode + ')');
+		return false;
+	}
+	// --- End of Service Connection Operation ---
+	// --- Load Cryptoki Operation ---
+	if (!PK_SetCryptoki.isCalled) {
+
+		PK_SetCryptoki.rootMethod = rootMethod;
+		PK_SetCryptoki.showErrorAlert = false;
+		PK_SetCryptoki.pk_ipCryptokiType = 0;
+		PK_SetCryptoki.pk_ipCryptoki = "parskey11.dll";
+		PK_SetCryptoki.call();
+
+		return true;
+	} else if (PK_SetCryptoki.isCalled && !PK_SetCryptoki.success) {
+		PK_SetCryptoki.reset();
+		PK_ServiceConnection.reset();
+		alert("هیچ توکنی به سیستم متصل نیست، لطفا توکن خود را به سیستم متصل نمائید");
+		alert("signing operation has been failed due to _PK_SetCryptoki: "
+				+ PK_SetCryptoki.pk_opErrorMessage + ' ('
+				+ PK_SetCryptoki.pk_opErrorCode + ')');
+		return false;
+
+	}
+	// ---- End of Load Cryptoki Operation ---
+
+	// --- Get Slot count ---
+	if (!PK_GetSlotCount.isCalled) {
+		PK_GetSlotCount.rootMethod = rootMethod;
+		PK_GetSlotCount.showErrorAlert = false;
+		PK_GetSlotCount.call();
+		return true;
+	} else if (PK_GetSlotCount.isCalled && !PK_GetSlotCount.success) {
+		PK_GetSlotCount.reset();
+		PK_SetCryptoki.reset();
+		PK_ServiceConnection.reset();
+		alert("هیچ توکنی به سیستم متصل نیست، لطفا توکن خود را به سیستم متصل نمائید");
+		// alert("signing operation has been failed due to : " +
+		// PK_GetSlotCount.pk_opErrorMessage + ' (' +
+		// PK_GetSlotCount.pk_opErrorCode + ')');
+		return false;
+
+	} else if (PK_GetSlotCount.isCalled
+			&& (PK_GetSlotCount.pk_opErrorCode == 0)) {
+		nSlot = PK_GetSlotCount.pk_opSlotCount;
+	}
+
+	while (i < nSlot) {
+
+		// --- is the token is present? ---
+		if (!PK_CheckToken.isCalled) {
+			PK_CheckToken.rootMethod = rootMethod;
+			PK_CheckToken.showErrorAlert = false;
+			PK_CheckToken.pk_ipSlotId = i;
+			PK_CheckToken.call();
+			return true;
+		} else if (PK_CheckToken.isCalled && !PK_CheckToken.success) {
+			PK_CheckToken.reset();
+			i++;
+			continue;
+
+		} else if (PK_CheckToken.isCalled
+				&& (PK_CheckToken.pk_opErrorCode == 0)) {
+			present = PK_CheckToken.pk_opPresent;
+		}
+		// ---- End of Check Present Status ---
+		if (present) {
+			var tokenInfo = "";
+			var ipJSONtmp;
+			var label = "";
+			var manufacturerID = "";
+			var model = "";
+			var serialNum = "";
+
+			// --- Get Slot Information ---
+			if (!PK_GetSlotInfo.isCalled) {
+				PK_GetSlotInfo.rootMethod = rootMethod;
+				PK_GetSlotInfo.showErrorAlert = false;
+				PK_GetSlotInfo.pk_ipSlotId = i;
+				PK_GetSlotInfo.call();
+				return true;
+			} else if (PK_GetSlotInfo.isCalled && !PK_GetSlotInfo.success) {
+				PK_GetSlotInfo.reset();
+				PK_CheckToken.reset();
+				i++;
+				continue;
+
+			} else if (PK_GetSlotInfo.isCalled && PK_GetSlotInfo.success) {
+				label = PK_GetSlotInfo.pk_opLabel;
+				manufacturerID = PK_GetSlotInfo.pk_opManufacturerID;
+				model = PK_GetSlotInfo.pk_opModel;
+				serialNum = PK_GetSlotInfo.pk_opSerialNumber;
+				tokenInfo = label + "::" + serialNum;
+			}
+			// --- End of Get Slot Information Operation ---
+
+			// --- Get PublicKey ---
+			var strSubject = "";
+			var strPubKeys = "";
+
+			if (!PK_GetPubKeys.isCalled) {
+				PK_GetPubKeys.rootMethod = rootMethod;
+				PK_GetPubKeys.showErrorAlert = false;
+				PK_GetPubKeys.pk_ipSlotId = i;
+				PK_GetPubKeys.call();
+				return true;
+			} else if (PK_GetPubKeys.isCalled && !PK_GetPubKeys.success) {
+				PK_GetPubKeys.reset();
+				PK_GetSlotInfo.reset();
+				PK_CheckToken.reset();
+				i++;
+				continue;
+
+			} else if (PK_GetPubKeys.isCalled && PK_GetPubKeys.success) {
+				strSubject = PK_GetPubKeys.pk_opSubjects;
+				strPubKeys = PK_GetPubKeys.pk_opPublicKeys;
+			}
+			// --- End of Get PublicKey ---
+			var arrSubjects = strSubject.split(";");
+			var arrPubKeys = strPubKeys.split(";");
+
+			while (ctr < arrPubKeys.length) {
+
+				if (arrPubKeys[ctr] != "") {
+					// --- Get certificate ---
+					var cert = "";
+
+					if (!PK_GetCertById.isCalled) {
+						PK_GetCertById.rootMethod = rootMethod;
+						PK_GetCertById.showErrorAlert = false;
+						PK_GetCertById.pk_ipPubKey = arrPubKeys[ctr];
+						PK_GetCertById.call();
+
+						// return true;
+					} else if (PK_GetCertById.isCalled
+							&& !PK_GetCertById.success) {
+						PK_GetCertById.reset();
+						ctr++;
+						continue;
+
+					} else if (PK_GetCertById.isCalled
+							&& (PK_GetCertById.pk_opErrorCode == 0)) {
+						cert = PK_GetCertById.pk_opCertificate;
+					}
+					// //////////////////////////////////////
+
+					// --- check certificate usage ---
+					var usage = "KeyUsage::C=T,DIGITAL_SIGNATURE=T,NON_REPUDIATION=T,KEY_ENCIPHERMENT=F,DATA_ENCIPHERMENT=F,KEY_AGREEMENT=F,KEY_CERT_SIGN=F,CRL_SIGN=F,ENCIPHER_ONLY=F,DECIPHER_ONLY=F;ExtendedKeyUsage::C=F,SERVER_AUTH=F,CLIENT_AUTH=F,CODE_SIGN=F,EMAIL_PROTECTION=F,TIME_STAMPING=F,OCSP_SIGN=F,SMART_CARD_LOGIN=F";
+					// var usage = "";
+					if (usage != "") {
+						if (!PK_CheckCertUsage.isCalled) {
+							PK_CheckCertUsage.rootMethod = rootMethod;
+							PK_CheckCertUsage.showErrorAlert = false;
+							PK_CheckCertUsage.pk_ipUsage = usage;
+							PK_CheckCertUsage.pk_ipCertificate = cert;
+							PK_CheckCertUsage.call();
+							return true;
+						} else if (PK_CheckCertUsage.isCalled
+								&& !PK_CheckCertUsage.success) {
+							PK_CheckCertUsage.reset();
+							PK_GetCertById.reset();
+							ctr++;
+							continue;
+
+						}
+					}
+					// //////////////////////////////////////
+
+					// --- Get certificate info ---
+					var subject = "";
+					var pubkey = "";
+					var keyId = "";
+
+					var Tumbprint = "";
+
+					if (!PK_GetInfoCertificate.isCalled) {
+						PK_GetInfoCertificate.rootMethod = rootMethod;
+						PK_GetInfoCertificate.showErrorAlert = false;
+						PK_GetInfoCertificate.pk_ipCertificate = cert;
+						PK_GetInfoCertificate.pk_ipSel = 1;
+						PK_GetInfoCertificate.call();
+						return true;
+					} else if (PK_GetInfoCertificate.isCalled
+							&& !PK_GetInfoCertificate.success) {
+						PK_CheckCertUsage.reset();
+						PK_GetCertById.reset();
+						PK_GetInfoCertificate.reset();
+						ctr++;
+						continue;
+
+					} else if (PK_GetInfoCertificate.isCalled
+							&& (PK_GetInfoCertificate.pk_opErrorCode == 0)) {
+						subject = PK_GetInfoCertificate.pk_opSubject;
+						pubkey = PK_GetInfoCertificate.pk_opPubKey;
+						keyId = PK_GetInfoCertificate.pk_opKeyId;
+						var strCertThumbPrint = PK_GetInfoCertificate.pk_opInfo;
+
+						var arrCertThumbPrint = strCertThumbPrint.split(";");
+
+						for ( var j = 0; j < arrCertThumbPrint.length; j++)
+
+						{
+
+							if (arrCertThumbPrint[j] != ""
+									&& arrCertThumbPrint[j])
+
+							{
+
+								var n = -1;
+								n = arrCertThumbPrint[j].search("Tumbprint:");
+
+								if (n >= 0)
+
+								{
+
+									Tumbprint = arrCertThumbPrint[j].substring(
+											n + 10, arrCertThumbPrint[j].length
+													- n);
+
+									Tumbprint = Tumbprint.replace(/\s+/g, '');// if
+																				// you
+																				// want
+																				// to
+																				// delete
+																				// space
+																				// between
+																				// hex
+																				// numbers
+																				// then
+																				// you
+																				// must
+																				// be
+																				// uncommented
+																				// this
+																				// code
+																				// line.
+
+								}
+
+							}
+
+						}
+						// Tumbprint=pk_opInfo.substr(pk_opInfo.indexOf("Tumbprint")+10,pk_opInfo.length-(pk_opInfo.indexOf("Tumbprint")+10)-1);
+
+					}
+					// //////////////////////////////////////
+					// --- Get certificate common name ---
+					var certCN = "";
+
+					if (!PK_GetCN.isCalled) {
+						PK_GetCN.rootMethod = rootMethod;
+						PK_GetCN.showErrorAlert = false;
+						PK_GetCN.pk_ipCertificate = cert;
+
+						PK_GetCN.call();
+						return true;
+					} else if (PK_GetCN.isCalled && !PK_GetCN.success) {
+						PK_CheckCertUsage.reset();
+						PK_GetCertById.reset();
+						PK_GetInfoCertificate.reset();
+						PK_GetCN.reset();
+						ctr++;
+						continue;
+
+					} else if (PK_GetCN.isCalled
+							&& (PK_GetCN.pk_opErrorCode == 0)) {
+						certCN = PK_GetCN.pk_opCN;
+					}
+
+					// --- End of Get Certificate Common Name ---
+					// get certThumb
+					users.push({
+						certificate : cert,
+						pubKey : arrPubKeys[ctr],
+						keyId : keyId,
+						tokenInfo : tokenInfo,
+						certInfoIdex : maxValidCertCtr.toString() + "-"
+								+ certCN + "-" + tokenInfo,
+						pincode : "",
+						tokenSlotIdx : i,
+						certThumbPrint : Tumbprint
+
+					});
+					maxValidCertCtr++;
+
+					PK_GetCertById.reset();
+					PK_CheckCertUsage.reset();
+					PK_GetInfoCertificate.reset();
+
+					PK_GetCN.reset();
+				} else {
+					PK_GetSlotInfo.reset();
+					PK_CheckToken.reset();
+					PK_GetPubKeys.reset();
+				}
+
+				ctr++;
+			}
+			ctr = 0;
+		}
+		i++;
+
+	}
+	PK_SetCryptoki.reset();
+	PK_ServiceConnection.reset();
+	i = 0;
+	maxValidCertCtr = 0;
+	if (users.length == 0) {
+		alert("هیچ گواهی مناسبی بر روی توکن های متصل به سیستم وجود ندارد");
+		return false;
+	}
+	if(document.getElementById("certThumbPrint")){
+		document.getElementById("certThumbPrint").value = getCertThumbPrint();
+	}
+	rootMethod=beforeRootMethod;
+	eval(rootMethod);
+}
