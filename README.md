@@ -12,6 +12,7 @@ This application is fully integrated with Sharif University of Technology Educat
 - Redis
 - React
 - HTML / CSS (Some pages)
+- so many more!
 
 ## Contribution
 Feel free to contribute.
