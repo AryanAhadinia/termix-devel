@@ -6,6 +6,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { body, validationResult } = require('express-validator');
+const path = require("path");
 
 // Configure environment
 env.config();
@@ -42,6 +43,8 @@ function validate(req, res, next) {
     }
     next();
 }
+
+
 
 // APIs
 /*
@@ -96,6 +99,9 @@ POST /api/user/forget_password/request with URLENCODED: email
 */
 app.get('/api/user/forget_password/serve/:token', user.serveForgetPassword);
 
+
+app.get('/api/user/verify/serve/:token', user.serveVerifyAccount);
+
 /*
 401
 200
@@ -116,11 +122,18 @@ app.get('/api/user/my_account',
     user.authenticateMiddleware,
     user.myAccount);
 
-
-app.put('/api/user/update_account',
-    user.authenticateMiddleware,
-    // TODO
-);
+// app.put('/api/user/update_account',
+//     user.authenticateMiddleware,
+//     body('firstName').isAlphanumeric().isLength({max: 30}).withMessage('نام وارد شده معتبر نیست.'),
+//     body('lastName').isLength({max: 30}).withMessage('نام خانوادگی معتبر نیست.'),
+//     body('stdId').isNumeric().isLength({min: 8, max: 8}).withMessage('شماره دانشجویی معتبر نیست'),
+//     body('major').isLength({max:50}).withMessage('رشته تحصیلی معتبر نیست.'),
+//     body('grade').isBoolean(),
+//     validate,
+//     user.validateMajor,
+//     user.minifyAccount,
+//     user.updateAccount,
+// );
 
 app.get('/api/schedule/all_courses', schedule.allCourses);
 //

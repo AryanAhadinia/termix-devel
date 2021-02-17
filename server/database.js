@@ -68,6 +68,40 @@ function departments(callback) {
     });
 }
 
+function departmentsList(callback) {
+    redisClient.get('departmentsList', (err, res) => {
+        if (err || !res) {
+            departments((err1, res1) => {
+                if (err1) {
+                    callback(err1, undefined);
+                } else {
+                    const depslist = [];
+                    for (let id in res1) {
+                        list.push(res1[id]);
+                    }
+                    redisClient.set('departmentsList', JSON.stringify(depslist));
+                    redisClient.expire('departmentsList', 60);
+                    callback(undefined, JSON.stringify(depslist));
+                }
+            })
+        } else {
+            callback(undefined, res);
+        }
+    });
+}
+
+function emailPermission(email, callback) {
+    redisClient.get(`e:${email}`, (err, result) => {
+        if (err || !result) {
+            callback(false, true);
+            redisClient.set(`e:${email}`, email);
+            redisClient.expire(`e:${email}`, 60);
+        } else {
+            callback(true, false);
+        }
+    });
+}
+
 function drop(callback) {
     redisClient.flushall(callback);
 }
@@ -75,5 +109,7 @@ function drop(callback) {
 module.exports = {
     "courses": courses,
     "departments": departments,
+    "departmentsList": departmentsList,
+    "emailPermission": emailPermission,
     "drop": drop
 }

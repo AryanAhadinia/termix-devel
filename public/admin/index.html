@@ -12,8 +12,11 @@
     <link href="https://v1.fontapi.ir/css/Sahel" rel="stylesheet">
     <style>
         body {
-            font-family: 'Sahel', sans-serif;
             background-image: linear-gradient(to right, rgba(255, 0, 0, 0), rgba(64, 185, 255, 0.521));
+        }
+
+        * {
+            font-family: 'Sahel', sans-serif;
         }
     </style>
     <title>پنل مدیریت</title>
@@ -54,21 +57,29 @@
                 </p>
             </div>
             <form class="row g-3 needs-validation" novalidate>
-                <div class="col-pane">
+                <div class="col-12">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="eduToken" placeholder="token" required>
                         <label for="eduToken">احراز هویت سامانه آموزش</label>
                         <div class="invalid-feedback">
                             لطفا token دریافتی از سامانه آموزش را وارد کنید.
                         </div>
+                        <script>
+                            $('#eduToken').attr('disabled', 'disabled');
+                            $('#eduToken').val('در حال حاضر سامانه آموزش بدل سازی شده است، نیازی به وارد کردن کلید احراز هویت نیست.')
+                        </script>
                     </div>
                 </div>
-                <div class="col-20">
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button class="btn btn-lg btn-outline-primary" type="submit">دریافت داده از سامانه
+                <div class="col-12" id="alr-crawl">
+
+                </div>
+                <div class="col-12">
+                    <div class="d-grid gap-2">
+                        <button id="crawl" class="btn btn-lg btn-outline-primary" type="submit">دریافت داده از سامانه
                             آموزش</button>
                     </div>
                 </div>
+
             </form>
         </div>
         <div class="tab-pane fade" id="pills-term" role="tabpanel" aria-labelledby="pills-term-tab">
@@ -90,6 +101,9 @@
                     </button>
                 </div>
             </div>
+            <div class="col-12" id="alr-delete">
+
+            </div>
             <div class="modal fade" id="dbdropModal" tabindex="-1" aria-labelledby="dbdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -104,7 +118,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">لغو</button>
-                            <button type="button" class="btn btn-success">ادامه</button>
+                            <button id="delete" type="button" class="btn btn-success">ادامه</button>
                         </div>
                     </div>
                 </div>

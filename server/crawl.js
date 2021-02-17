@@ -21,8 +21,10 @@ const dayMap = {
 };
 
 async function requestCrawl(req, res) {
+    // res.sendStatus(200);
     try {
         database.departments(async (err, departments) => {
+            departments = JSON.parse(departments);
             if (err) {
                 throw err;
             }

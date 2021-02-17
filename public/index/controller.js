@@ -2,26 +2,22 @@ $(window).resize(setSize);
 $(document).ready(setSize);
 
 function setSize() {
-    $('#pills-signin').removeClass('show').removeClass('active');
-    $('#pills-home').removeClass('show').removeClass('active');
-    $('#pills-signup').removeClass('show').removeClass('active');
-    $('#pills-signin-tab').removeClass('active');
-    $('#pills-home-tab').removeClass('active');
-    $('#pills-signup-tab').removeClass('active');
     if ($(window).width() < 1125) {
         $('#right-side').addClass('d-none');
         $('#left-side').removeClass('col-6').addClass('col-12');
         $('#pills-home').removeClass('d-none');
         $('#pills-home-tab').removeClass('d-none');
-        $('#pills-home').addClass('show').addClass('active');
-        $('#pills-home-tab').addClass('active');
     } else {
         $('#left-side').removeClass('col-12').addClass('col-6');
         $('#right-side').removeClass('d-none');
         $('#pills-home').addClass('d-none');
         $('#pills-home-tab').addClass('d-none');
-        $('#pills-signin').addClass('show').addClass('active');
-        $('#pills-signin-tab').addClass('active');
+        if ($('#pills-home').hasClass('active')) {
+            $('#pills-home').removeClass('show').removeClass('active');
+            $('#pills-home-tab').removeClass('active');
+            $('#pills-signin').addClass('show').addClass('active');
+            $('#pills-signin-tab').addClass('active');
+        }
     }
 }
 
@@ -56,7 +52,7 @@ document.getElementById("signin").onclick = function () {
             } else if (this.status == 400) {
                 alert('#alert-placeholder-signin', 'danger', JSON.parse(this.responseText).msg || 'درخواست ارسال شده معتبر نیست');
             } else if (this.status == 401) {
-                alert('#alert-placeholder-signin', 'danger', 'پارامتر های ورودی را کنترل کنید.');
+                alert('#alert-placeholder-signin', 'danger', this.responseText || 'پارامتر های ورودی را کنترل کنید.');
             } else if (this.status == 500) {
                 alert('#alert-placeholder-signin', 'warning', 'سرور اختلالاتی را تجربه می کند. چند دقیقه دیگر تلاش کنید')
             } else {
@@ -88,7 +84,7 @@ document.getElementById("signup").onclick = function () {
             $('#signup').html('نام‌نویسی');
             $('#signup').removeAttr('disabled');
             if (this.status == 200) {
-                redirectToPanel('std');
+                alert('#alert-placeholder-signup', 'success', 'نام‌نویسی خود را از سریق ایمیل تکمیل کنید.');
             } else if (this.status == 400) {
                 alert('#alert-placeholder-signup', 'danger', JSON.parse(this.responseText).msg || 'درخواست ارسال شده معتبر نیست.');
             } else if (this.status == 409) {
