@@ -1,0 +1,157 @@
+@font-face {
+	font-family: tahamtan;
+	src: url(./resources/Tahamtan.woff);
+}
+
+@font-face {
+	font-family: katibeh;
+	src: url(./resources/katibeh.ttf);
+}
+
+@font-face {
+	font-family: kalameh;
+	src: url(./resources/KalamehWeb/woff/KalamehWeb_Regular.woff);
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: kalameh-thin;
+	src: url(./resources/KalamehWeb/woff/KalamehWeb_thin.woff);
+	font-weight: lighter;
+}
+
+@font-face {
+	font-family: kalameh-black;
+	src: url(./resources/KalamehWeb/woff/KalamehWeb_Black.woff);
+	font-weight: bolder;
+}
+
+@font-face {
+	font-family: kalameh-bold;
+	src: url(./resources/KalamehWeb/woff/KalamehWeb_Bold.woff);
+	font-weight: bolder;
+}
+.small-card-container {
+	display: flex;
+	align-items: center;
+	width: 200px;
+	margin: auto;
+	display: inline-block;
+	position: relative;
+	padding: 30% 2em;
+	box-sizing: border-box;
+	white-space: nowrap !important;
+	flex-wrap: nowrap;
+	$border: 5px;
+	color: #fff;
+	background: rgba(0, 0, 0, 0.7);
+	background-clip: padding-box;
+	border: solid $border transparent;
+	margin: 0px 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+	transition: transform 0.5s ease-in-out;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: -1;
+		margin: -$border;
+		border-radius: inherit;
+		backdrop-filter: blur(5px);
+		background: linear-gradient(
+			50deg,
+			#ff7818a4,
+			#af002c8c 41.07%,
+			#3190979a 76.05%
+		);
+	}
+}
+
+.small-card-container:hover {
+	transform: translateY(-15px);
+}
+
+.small-card-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 0;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	width: 100%;
+	height: 100%;
+	white-space: pre-wrap;
+}
+.class-time {
+	padding: 5px 15px !important;
+	opacity: 0.8;
+	direction: ltr;
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.4vw;
+	font-weight: 600;
+}
+
+.class-name {
+	text-align: right;
+	padding: 5px 15px;
+	font-size: 120%;
+	font-family: kalameh-bold;
+	text-shadow: 2px 2px rgba(0, 0, 0, 0.75);
+}
+
+.class-master {
+	text-align: right;
+	padding: 5px 15px;
+	font-family: kalameh-thin;
+	opacity: 0.6;
+}
+
+.class-exam {
+	padding: 5px 15px;
+	font-family: kalameh-thin;
+}
+
+.menu-item:hover {
+	svg {
+		transition: transform 0.3s ease-in-out;
+	}
+
+	div {
+		transition: transform 0.3s ease-in-out, font-size 0.3s ease-in-out;
+	}
+}
+
+.menu-item:hover {
+	svg {
+		transform: scale(1.1);
+	}
+
+	div {
+		transform: translateX(-10px);
+		font-size: 120%;
+	}
+}
+
+.big-logo {
+	transition: transform 0.3s ease-in-out;
+	cursor: cell;
+}
+
+.big-logo:hover {
+	transform: scale(1.15);
+}
+
+.small-logo {
+	transition: transform 0.3s ease-in-out;
+	cursor: cell;
+}
+
+.small-logo:hover {
+	transform: scale(1.15);
+}
