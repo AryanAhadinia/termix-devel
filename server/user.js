@@ -115,7 +115,7 @@ function signin(req, res) {
                     { 'maxAge': process.env.TOKEN_EXPIRY, 'httpOnly': true });
                 res.status(200).send(user.role);
             } else {
-                return res.sendStatus(401);
+                return res.status(401).send('گذرواژه معتبر نیست.');
             }
             try {
                 db.close();
@@ -993,7 +993,7 @@ function authenticateMiddleware(req, res, next) {
         return res.status(403).redirect('/');
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err || user.expiry < +new Date() || !user.verified) {
+        if (err || user.expiry < +new Date()) {
             return res.status(403).redirect('/');
         }
         database.accessPermission(user.email, (denied, accept) => {
